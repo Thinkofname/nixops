@@ -83,6 +83,7 @@ rec {
       ).config) ["_module"]) _resources;
 
   resources.sshKeyPairs = evalResources ./ssh-keypair.nix (zipAttrs resourcesByType.sshKeyPairs or []);
+  resources.cloudflareZones = evalResources ./cloudflare-zone.nix (zipAttrs resourcesByType.cloudflareZones or []);
 
   # Amazon resources
   resources.snsTopics = evalResources ./sns-topic.nix (zipAttrs resourcesByType.snsTopics or []);

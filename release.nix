@@ -4,7 +4,44 @@
 }:
 
 let
-  pkgs = import nixpkgs { };
+  pkgs = import nixpkgs {
+    config = {
+      packageOverrides = pkgs: rec {
+        python-jsonlines = pkgs.python2Packages.buildPythonPackage rec {
+          pname = "jsonlines";
+          version = "1.2.0";
+
+          buildInputs = with pkgs.python2Packages; [
+            six
+          ];
+
+          src = pkgs.python2Packages.fetchPypi {
+            inherit pname version;
+            sha256 = "43b8d5588a9d4862c8a4a49580e38e20ec595aee7ad6fe469b10fb83fbefde88";
+          };
+          doCheck = false;
+        };
+        python-cloudflare = pkgs.python2Packages.buildPythonPackage rec {
+          pname = "cloudflare";
+          version = "2.1.0";
+
+          buildInputs = with pkgs.python2Packages; [
+            requests
+            # logger
+            future
+            pyyaml
+            python-jsonlines
+          ];
+
+          src = pkgs.python2Packages.fetchPypi {
+            inherit pname version;
+            sha256 = "29ac4abe4451557053d4591f2604426a16f59bacd1740ea85c67d6808150eb1e";
+          };
+          doCheck = false;
+        };
+      };
+    };
+  };
   version = "1.7" + (if officialRelease then "" else "pre${toString nixopsSrc.revCount}_${nixopsSrc.shortRev}");
 
 in
@@ -96,6 +133,7 @@ rec {
           datadog
           digital-ocean
           typing
+          pkgs.python-cloudflare
         ] ++
         #FIXME add back once https://github.com/NixOS/nixops/pull/1131
         # is reverted.
